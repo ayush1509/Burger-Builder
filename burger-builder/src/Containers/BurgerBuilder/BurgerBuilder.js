@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import Aux from '../../HOC/Aux'
 import Burger from '../../Components/Burger/Burger'
 import BuildControls from '../../Components/Burger/BuildControls/BuildControls'
+import Modal from '../../Components/UI/Modal/Modal'
+import OrderSummary from '../../Components/Burger/OrderSummary/OrderSummary'
 
 const INGREDIENT_PRICE = {
     salad: 1,
@@ -18,7 +20,17 @@ class BurgerBuilder extends Component {
             cheese: 0,
             meat: 0
         },
+    purchaseable: false,
     total_price : 4
+    }
+
+    updatePurchase = (total_price) => {
+        if (total_price > 4){
+            this.setState({purchaseable: true})
+        }
+        else {
+            this.setState({purchaseable:false})
+        }
     }
     
     AddIngredientHandler = (type) => {
@@ -29,6 +41,7 @@ class BurgerBuilder extends Component {
         newstate[type] = count
         const price = this.state.total_price + INGREDIENT_PRICE[type]
         this.setState({total_price:price,ingredients:newstate})
+        this.updatePurchase(price)
 
     }
 
@@ -40,6 +53,7 @@ class BurgerBuilder extends Component {
         newstate[type] = count
         const price = this.state.total_price - INGREDIENT_PRICE[type]
         this.setState({total_price:price,ingredients:newstate})
+        this.updatePurchase(price)
 
     }
 
@@ -50,12 +64,16 @@ class BurgerBuilder extends Component {
         }
         return (
             <Aux>
+                <Modal>
+                    <OrderSummary ingredients={this.state.ingredients}/>
+                </Modal>
                 <Burger ingredients={this.state.ingredients}/>
                 <BuildControls 
-                addIngredient={this.AddIngredientHandler}
-                removeIngredient = {this.RemoveIngredientHandler}
-                disable = {disableInf0}
-                price = {this.state.total_price}
+                    addIngredient={this.AddIngredientHandler}
+                    removeIngredient = {this.RemoveIngredientHandler}
+                    disable = {disableInf0}
+                    price = {this.state.total_price}
+                    purchase = {this.state.purchaseable}
                 />
             </Aux>
         );

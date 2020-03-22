@@ -22,8 +22,7 @@ const loc = [
 ]
 const BuildControls = (props)=>(
     <div className={classes.BuildControls}>
-        {console.log(props.price)}
-        <p>Current Price:{props.price}</p>
+        <p>Current Price: {props.price}$</p>
         {loc.map( ctrl =>{
             return <BuildControl 
             key={ctrl.label} 
@@ -33,6 +32,7 @@ const BuildControls = (props)=>(
             disablebutton = {props.disable[ctrl.type]}
             />
         })}
+        <button className={classes.OrderButton} disabled={!props.purchase}>ORDER NOW</button>
 
     </div>
 )
