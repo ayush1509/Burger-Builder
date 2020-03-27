@@ -12,16 +12,27 @@ const INGREDIENT_PRICE = {
     cheese: 2
 }
 class BurgerBuilder extends Component {
-
     state = {
         ingredients: {
-            salad: 0,
-            bacon: 0,
             cheese: 0,
-            meat: 0
+            meat: 0,
+            bacon: 0,
+            salad: 0
         },
     purchaseable: false,
-    total_price : 4
+    total_price : 4,
+    purchasing: false
+    }
+
+    purchaseHandler = () =>{
+        this.setState({purchasing:true})
+    }
+    purchaseCancelHandler = () =>{
+        this.setState({purchasing:false})
+    }
+
+    purchaseContinueHandler = () => {
+        alert("You can Continue!")
     }
 
     updatePurchase = (total_price) => {
@@ -64,8 +75,11 @@ class BurgerBuilder extends Component {
         }
         return (
             <Aux>
-                <Modal>
-                    <OrderSummary ingredients={this.state.ingredients}/>
+                <Modal show={this.state.purchasing} cancel={this.purchaseCancelHandler}>
+                    <OrderSummary ingredients={this.state.ingredients}
+                        price = {this.state.total_price}
+                         canceled={this.purchaseCancelHandler}
+                           continued={this.purchaseContinueHandler}/>
                 </Modal>
                 <Burger ingredients={this.state.ingredients}/>
                 <BuildControls 
@@ -74,6 +88,7 @@ class BurgerBuilder extends Component {
                     disable = {disableInf0}
                     price = {this.state.total_price}
                     purchase = {this.state.purchaseable}
+                    ordered = {this.purchaseHandler}
                 />
             </Aux>
         );
