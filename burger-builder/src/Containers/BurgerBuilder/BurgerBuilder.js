@@ -12,7 +12,7 @@ import withErrorHandler from '../../HOC/withErrorHandler/withErrorHandler'
 import * as burgerBuilderActions from '../../store/action/index'
 
 
-class BurgerBuilder extends Component {
+export class BurgerBuilder extends Component {
     state = {
         purchasing: false
     }
@@ -23,7 +23,14 @@ class BurgerBuilder extends Component {
     }
 
     purchaseHandler = () =>{
-        this.setState({purchasing:true})
+        if(this.props.isAuthenticated){
+            this.setState({purchasing:true})
+        }
+        else {
+            this.props.onSetAuthRedirectPath('/checkout')
+            this.props.history.push('/auth')
+        }
+        
     }
     purchaseCancelHandler = () =>{
         this.setState({purchasing:false})
@@ -69,6 +76,7 @@ class BurgerBuilder extends Component {
                         price = {this.props.price}
                         purchase = {this.updatePurchase(this.props.ings)}
                         ordered = {this.purchaseHandler}
+                        isAuthenticated = {this.props.isAuthenticated}
                     />
                 </Aux>)
                 orderSummary = <OrderSummary ingredients={this.props.ings}
@@ -94,7 +102,8 @@ const mapStateToProps = state => {
     return {
         ings: state.burgerBuilder.ingredients,
         price: state.burgerBuilder.total_price,
-        error: state.burgerBuilder.error
+        error: state.burgerBuilder.error,
+        isAuthenticated: state.auth.token !== null
     }
 }
 
@@ -103,7 +112,9 @@ const mapDispatchToProps = dispatch => {
         onAddIngredients: (ing)=> dispatch(burgerBuilderActions.addIngredient(ing)),
         onRemoveIngredients: (ing)=> dispatch(burgerBuilderActions.removeIngredient(ing)),
         onSetIngredients: ()=> dispatch(burgerBuilderActions.initIngredient()),
-        onPurchasedInit: ()=> dispatch(burgerBuilderActions.purchaseInit())
+        onPurchasedInit: ()=> dispatch(burgerBuilderActions.purchaseInit()),
+        onSetAuthRedirectPath: (path)=> dispatch(burgerBuilderActions.setAuthRedirectPath(path))
     }
 }
+
 export default connect(mapStateToProps,mapDispatchToProps)(withErrorHandler(BurgerBuilder,axios));

@@ -15,7 +15,7 @@ const reducer =(state=initialState,action) => {
         case (actionTypes.BURGER_PURCHASE_START):
             return {
                 ...state,
-                loading:true
+                loading: true
             }
         case (actionTypes.BURGER_PURCHASE_SUCCESS) :
             const newOrder = {
@@ -30,6 +30,7 @@ const reducer =(state=initialState,action) => {
             }
         case (actionTypes.FETCH_INGREDIENT_FAILED):
             return {
+                ...state,
                 loading:false
 
             }
