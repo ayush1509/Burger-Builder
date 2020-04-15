@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { useEffect} from 'react'
 import Order from '../../Components/order/Order'
 import {connect} from 'react-redux'
 
@@ -7,15 +7,15 @@ import withErrorHandler from '../../HOC/withErrorHandler/withErrorHandler'
 import * as actions from '../../store/action/index'
 import Spinner from '../../Components/UI/Spinner/Spinner'
 
-class Orders extends Component {
+const Orders = props => {
 
-    componentDidMount (){
-        this.props.onFetchOrder(this.props.token,this.props.userId)        
-    }
-    render (){
+    useEffect(()=>{
+        props.onFetchOrder(props.token,props.userId)
+    },[])
+
         let fetchedOrders = <Spinner/>
-        if (!this.props.loading){
-            fetchedOrders = this.props.orders.map(order => (
+        if (!props.loading){
+            fetchedOrders = props.orders.map(order => (
                 <Order key={order.id} 
                     ingredients={order.ingredients}
                     price = {order.price}/>
@@ -27,7 +27,7 @@ class Orders extends Component {
         </div>
         )
     }
-}
+
 
 const mapStateToProps = state => {
     return {

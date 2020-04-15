@@ -1,36 +1,46 @@
-import React, { Component } from 'react';
+import React, {useEffect, Suspense } from 'react';
 import { Route, Switch, withRouter, Redirect } from 'react-router-dom';
 import {connect} from 'react-redux'
 
 import Layout from './Components/Layout/Layout'
 import BurgerBuilder from './Containers/BurgerBuilder/BurgerBuilder';
-import Checkout from './Containers/Checkout/Checkout';
-import Orders from './Containers/Orders/Orders'
-import Auth from './Containers/Auth/Auth';
 import Logout from './Containers/Auth/Logout/Logout';
 import {autoSignIn} from './store/action/index'
 
-class App extends Component {
-  componentDidMount () {
-    this.props.onAutoSignIn()
-  }
-  render () {
+
+const Checkout = React.lazy(()=>{
+  return import('./Containers/Checkout/Checkout')
+})
+
+const Orders = React.lazy(()=>{
+  return import('./Containers/Orders/Orders')
+})
+
+const Auth = React.lazy(()=>{
+  return import('./Containers/Auth/Auth')
+})
+
+const App = props => {
+  
+  useEffect (()=>{
+    props.onAutoSignIn()
+  },[])
+
   let routes = (
     <Switch>
-        <Route path="/auth" component={Auth}/>
+        <Route path="/auth" render={(props)=> <Auth {...props}/>}/>
         <Route path="/" exact component={BurgerBuilder}/>
         <Redirect to ="/"/>
     </Switch>
-
   )
 
-  if(this.props.isAuthenticated){
+  if(props.isAuthenticated){
     routes = (
       <Switch>
-          <Route path="/checkout" component={Checkout}/>
-          <Route path="/orders" component={Orders}/>
-          <Route path="/logout" component={Logout}/>
-          <Route path="/auth" component={Auth}/>
+          <Route path="/checkout" render={(props)=> <Checkout {...props} />}/>
+          <Route path="/orders"  render={(props)=><Orders {...props}/>}/>
+          <Route path="/logout" component={Logout} />
+          <Route path="/auth" render={(props)=><Auth {...props}/>}/>
           <Route path="/" exact component={BurgerBuilder}/>
           <Redirect to="/"/>
     </Switch>
@@ -41,24 +51,12 @@ class App extends Component {
   return (
     <div className="App">
       <Layout>
-        {routes}
-        <Switch>
-          {/* <Route path="/checkout" component={Checkout}/>
-          <Route path="/orders" component={Orders}/>
-          <Route path="/logout" component={Logout}/>
-          <Route path="/auth" component={Auth}/>
-          <Route path="/" exact component={BurgerBuilder}/>
-        <Redirect to="/"/> */}
-
-
-        </Switch>
-
-
+        <Suspense fallback={<p>Loading...</p>}>{routes}</Suspense>
       </Layout>
     </div>
   );
 }
-}
+
 
 
 const mapStateToProps = state => {
@@ -74,4 +72,3 @@ const mapDispatchToProps = dispatch => {
 }
 
 export default withRouter(connect(mapStateToProps,mapDispatchToProps)(App));
-// export default App

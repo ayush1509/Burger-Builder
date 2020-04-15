@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 
 import Aux from '../../HOC/Aux'
@@ -12,36 +12,34 @@ import withErrorHandler from '../../HOC/withErrorHandler/withErrorHandler'
 import * as burgerBuilderActions from '../../store/action/index'
 
 
-export class BurgerBuilder extends Component {
-    state = {
-        purchasing: false
-    }
+export const BurgerBuilder = props =>  {
+    const [ purchasing, setPurchasing] = useState(false)
 
-    componentDidMount (){
-        this.props.onSetIngredients()
+    useEffect( ()=>{
+        props.onSetIngredients()
         
-    }
+    },[])
 
-    purchaseHandler = () =>{
-        if(this.props.isAuthenticated){
-            this.setState({purchasing:true})
+    const purchaseHandler = () =>{
+        if(props.isAuthenticated){
+            setPurchasing(true)
         }
         else {
-            this.props.onSetAuthRedirectPath('/checkout')
-            this.props.history.push('/auth')
+            props.onSetAuthRedirectPath('/checkout')
+            props.history.push('/auth')
         }
         
     }
-    purchaseCancelHandler = () =>{
-        this.setState({purchasing:false})
+    const purchaseCancelHandler = () =>{
+        setPurchasing(false)
     }
 
-    purchaseContinueHandler = () => {
-        this.props.onPurchasedInit()
-        this.props.history.push('./checkout')
+    const purchaseContinueHandler = () => {
+        props.onPurchasedInit()
+        props.history.push('./checkout')
     }
 
-    updatePurchase = ( ingredients) => {
+    const updatePurchase = ( ingredients) => {
         const sum = Object.keys(ingredients)
             .map( igkey => {
                 return ingredients[igkey]
@@ -54,8 +52,7 @@ export class BurgerBuilder extends Component {
     }
     
 
-    render (){
-        const disableInf0 = {...this.props.ings}
+        const disableInf0 = {...props.ings}
         for (let key in disableInf0){
             disableInf0[key]= disableInf0[key]<=0
         }
@@ -63,32 +60,32 @@ export class BurgerBuilder extends Component {
         let orderSummary = null
         
         
-        let burger = this.props.error ? <p>Ingredients can't be loaded!</p>:<Spinner/>
+        let burger = props.error ? <p>Ingredients can't be loaded!</p>:<Spinner/>
 
-        if (this.props.ings){
+        if (props.ings){
             burger = (
                 <Aux>
-                    <Burger ingredients={this.props.ings}/>
+                    <Burger ingredients={props.ings}/>
                     <BuildControls 
-                        addIngredient={this.props.onAddIngredients}
-                        removeIngredient = {this.props.onRemoveIngredients}
+                        addIngredient={props.onAddIngredients}
+                        removeIngredient = {props.onRemoveIngredients}
                         disable = {disableInf0}
-                        price = {this.props.price}
-                        purchase = {this.updatePurchase(this.props.ings)}
-                        ordered = {this.purchaseHandler}
-                        isAuthenticated = {this.props.isAuthenticated}
+                        price = {props.price}
+                        purchase = {updatePurchase(props.ings)}
+                        ordered = {purchaseHandler}
+                        isAuthenticated = {props.isAuthenticated}
                     />
                 </Aux>)
-                orderSummary = <OrderSummary ingredients={this.props.ings}
-                price = {this.props.price}
-                canceled={this.purchaseCancelHandler}
-                continued={this.purchaseContinueHandler}/>
+                orderSummary = <OrderSummary ingredients={props.ings}
+                price = {props.price}
+                canceled={purchaseCancelHandler}
+                continued={purchaseContinueHandler}/>
     
         }
 
         return (
             <Aux>
-                <Modal show={this.state.purchasing} cancel={this.purchaseCancelHandler}>
+                <Modal show={purchasing} cancel={purchaseCancelHandler}>
                     {orderSummary}        
                 </Modal>
                 {burger}
@@ -96,7 +93,6 @@ export class BurgerBuilder extends Component {
             </Aux>
         );
     }
-}
 
 const mapStateToProps = state => {
     return {
